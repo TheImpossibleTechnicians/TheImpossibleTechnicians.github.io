@@ -39,7 +39,11 @@
 <section class="process section" id="process"><div class="section-head"><div><p class="eyebrow"><i></i> THE PROCESS</p><h2>Four steps.<br><span>Zero guesswork.</span></h2></div></div>
 <div class="steps"><div><b>01</b><h3>Tell us what's wrong</h3><p>Describe the device and the issue through our booking form.</p></div><div><b>02</b><h3>We diagnose</h3><p>We identify the likely cause before recommending a repair.</p></div><div><b>03</b><h3>We repair</h3><p>Once approved, the repair or upgrade gets underway.</p></div><div><b>04</b><h3>You get it back</h3><p>We explain what was done and what to watch for next.</p></div></div></section>
 <section class="booking section" id="booking"><div class="booking-intro"><p class="eyebrow"><i></i> START A REPAIR</p><h2>Let's make your<br><span>Tech work again.</span></h2><p>Send the details below. Your request will be sent directly to our team.</p><div class="contact-mini"><span>CALL / WHATSAPP</span><strong>+91 99941 15601</strong><span>EMAIL</span><strong>wearetheimpossibletechnicians@gmail.com</strong></div></div>
-<form id="bookingForm" action="https://formsubmit.co/wearetheimpossibletechnicians@gmail.com" method="POST"><input type="hidden" name="_subject" value="New Service Booking — The Impossible Technicians"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_template" value="table">
+<form id="bookingForm" action="https://silentforms.com/api/submit" method="POST">
+<input type="hidden" name="accessKey" value="f8a3bdde7c834d3be0844f362e7b355208ad12005fec9f45b6587e1d3337c7ef">
+<input type="hidden" name="subject" value="New Service Booking — The Impossible Technicians">
+<input type="hidden" name="from_name" value="The Impossible Technicians Website">
+<label style="display:none!important;position:absolute!important;left:-10000px!important" aria-hidden="true">Leave this field empty<input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off"></label>
 <div class="form-row"><label>Your name<input name="name" required placeholder="Full name"></label><label>Phone number<input name="phone" required placeholder="+91"></label></div>
 <div class="form-row"><label>Email<input type="email" name="email" placeholder="you@example.com"></label><label>Device<input name="device" required placeholder="e.g. Lenovo laptop"></label></div>
 <label>Service<select name="service" id="serviceSelect" required><option value="">Choose a service</option><option>Laptop / PC Repair</option><option>Phone / Tablet Repair</option><option>Electronics Repair</option><option>Upgrade / Performance</option><option>Other</option></select></label>
@@ -50,13 +54,48 @@
 <section class="contact section" id="contact"><div><p class="eyebrow"><i></i> CONTACT</p><h2>Have a question?<br><span>Talk to us.</span></h2></div><div class="contact-links"><a href="tel:+919994115601"><small>PHONE</small><strong>+91 99941 15601</strong></a><a href="https://wa.me/919994115601" target="_blank"><small>WHATSAPP</small><strong>Message us ↗</strong></a><a href="mailto:wearetheimpossibletechnicians@gmail.com"><small>EMAIL</small><strong>wearetheimpossibletechnicians@gmail.com</strong></a></div></section>
 </main>
 <footer><span>© 2026 The Impossible Technicians</span><span>Repairing the “impossible” since day one.</span></footer>
-<div class="toast" id="toast">Sending your service request…</div>
+<div class="toast" id="toast" role="status" aria-live="polite">Sending your service request…</div>
 <script>
 const menu=document.querySelector(".menu"),nav=document.querySelector(".topbar nav");
 menu?.addEventListener("click",()=>{nav.style.display=nav.style.display==="flex"?"none":"flex";nav.style.position="absolute";nav.style.top="82px";nav.style.left="0";nav.style.right="0";nav.style.padding="22px 6vw";nav.style.background="#080a0d";nav.style.flexDirection="column";nav.style.gap="20px";});
 document.querySelectorAll("[data-service]").forEach(a=>a.addEventListener("click",()=>{const s=document.querySelector("#serviceSelect");if(s)s.value=a.dataset.service;}));
 const form=document.querySelector("#bookingForm"),toast=document.querySelector("#toast");
-form?.addEventListener("submit",()=>{toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3500);});
+form?.addEventListener("submit",async(event)=>{
+  event.preventDefault();
+  const accessKey=form.querySelector('input[name="accessKey"]')?.value.trim();
+  const submitButton=form.querySelector('button[type="submit"]');
+  if(!accessKey){
+    toast.textContent="Please add your SilentForms access key before publishing the form.";
+    toast.classList.add("show");
+    setTimeout(()=>toast.classList.remove("show"),5000);
+    return;
+  }
+  const originalButtonText=submitButton.innerHTML;
+  submitButton.disabled=true;
+  submitButton.textContent="Sending…";
+  toast.textContent="Sending your service request…";
+  toast.classList.add("show");
+  try{
+    const data=Object.fromEntries(new FormData(form).entries());
+    const response=await fetch("https://silentforms.com/api/submit",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Accept":"application/json"},
+      body:JSON.stringify(data)
+    });
+    const result=await response.json();
+    if(!response.ok || result.status!=="success") throw new Error(result.message || "Your request could not be sent. Please try again.");
+    form.reset();
+    toast.textContent="Your service request was sent successfully! We'll contact you soon.";
+    toast.classList.add("show");
+  }catch(error){
+    toast.textContent=error.message || "Something went wrong. Please try again or contact us by WhatsApp.";
+    toast.classList.add("show");
+  }finally{
+    submitButton.disabled=false;
+    submitButton.innerHTML=originalButtonText;
+    setTimeout(()=>toast.classList.remove("show"),6000);
+  }
+});
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",()=>{if(innerWidth<901&&nav)nav.style.display="none"}));
 </script>
 </body></html>
