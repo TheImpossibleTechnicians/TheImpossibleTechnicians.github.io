@@ -151,14 +151,16 @@ form?.addEventListener("submit",async(event)=>{
   try{
     await sendToFormSubmit(primaryPayload);
     form.reset();
-    showFormMessage("Your service request was sent successfully! We'll contact you soon. Ref: "+reference);
+    window.location.assign("thank-you.html?ref="+encodeURIComponent(reference)+"&via=formsubmit");
+    return;
   }catch(primaryError){
     console.warn("FormSubmit failed; trying RG Forms backup.",primaryError);
     showFormMessage("Primary email delivery failed. Trying our backup…");
     try{
       await sendToRGForms(booking,reference);
       form.reset();
-      showFormMessage("Your request was saved through our backup system. We'll contact you soon. Ref: "+reference);
+      window.location.assign("thank-you.html?ref="+encodeURIComponent(reference)+"&via=rgforms");
+      return;
     }catch(backupError){
       console.error("Both form services failed.",backupError);
       showFormMessage("We couldn't send your request automatically. Please contact us on WhatsApp at +91 99941 15601. Ref: "+reference);
