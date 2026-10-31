@@ -24,8 +24,17 @@
 <div class="hero-actions"><a class="button primary" href="#booking">Book a service <span>→</span></a><a class="text-link" href="#services">Explore services ↓</a></div>
 <div class="trust"><span>★ 5-star care</span><span>•</span><span>Clear pricing</span><span>•</span><span>Personal support</span></div>
 </div><div class="hero-art"><div class="orbit orbit1"></div><div class="orbit orbit2"></div>
-<div class="device"><div class="screen"><div class="screen-top">SYSTEM DIAGNOSTIC <b>● LIVE</b></div><div class="terminal"><span>checking hardware...</span><span>memory ........ OK</span><span>storage ....... OK</span><span>power .......... <strong>FAULT FOUND</strong></span><span>repair path .... READY</span></div></div><div class="base"></div></div>
-<div class="floating-card card-a"><small>DIAGNOSIS</small><strong>FOUND</strong><span>✓ Hardware fault</span></div><div class="floating-card card-b"><small>STATUS</small><strong>REPAIRING</strong><span>● Technician assigned</span></div>
+<div class="device" id="demoLaptop" aria-label="Animated simulated laptop diagnostic display">
+<div class="screen">
+<div class="screen-top">SIMULATED SYSTEM CHECK <b id="diag-indicator">● AUTO SCAN</b></div>
+<div class="terminal" aria-live="polite">
+<span id="diag-line-1">waiting for next scan...</span>
+<span id="diag-line-2">memory ........ --</span>
+<span id="diag-line-3">storage ....... --</span>
+<span id="diag-line-4">power .......... --</span>
+<span id="diag-line-5">demo scan ..... READY</span>
+</div></div><div class="base"></div></div>
+<div class="floating-card card-a"><small>SIMULATED DIAGNOSIS</small><strong id="diag-card-value">STANDBY</strong><span id="diag-card-note">Automatic check every 10 sec</span></div><div class="floating-card card-b"><small>LAST DEMO CHECK</small><strong id="diag-status-value">WAITING</strong><span id="diag-status-note">Visual demonstration only</span></div>
 </div></section>
 <section class="marquee"><div>REPAIR <b>•</b> RESTORE <b>•</b> UPGRADE <b>•</b> REVIVE <b>•</b> REPAIR <b>•</b> RESTORE <b>•</b> UPGRADE <b>•</b> REVIVE</div></section>
 <section class="services section" id="services"><div class="section-head"><div><p class="eyebrow"><i></i> WHAT WE DO</p><h2>We bring your<br><span>devices back.</span></h2></div><p>From a dead laptop to a stubborn charging port, we focus on finding the real problem—not just covering up the symptoms.</p></div>
@@ -160,6 +169,70 @@ form?.addEventListener("submit",async(event)=>{
     setTimeout(()=>toast.classList.remove("show"),9000);
   }
 });
+
+// Animated laptop-screen diagnostic demo. This is a visual simulation only;
+// browser code cannot test the visitor's physical computer hardware.
+(function startLaptopDemo(){
+  const byId = id => document.getElementById(id);
+  const lines = [
+    byId("diag-line-1"), byId("diag-line-2"), byId("diag-line-3"),
+    byId("diag-line-4"), byId("diag-line-5")
+  ];
+  const indicator = byId("diag-indicator");
+  const cardValue = byId("diag-card-value");
+  const cardNote = byId("diag-card-note");
+  const statusValue = byId("diag-status-value");
+  const statusNote = byId("diag-status-note");
+  if (lines.some(line => !line) || !indicator || !cardValue || !cardNote || !statusValue || !statusNote) return;
+
+  let scanTimer;
+  let stepTimer;
+  const scanSteps = [
+    ["starting simulated diagnostic...", "memory ........ checking", "storage ....... checking", "power .......... checking", "demo scan ..... RUNNING"],
+    ["checking demo components...", "memory ........ OK", "storage ....... checking", "power .......... checking", "demo scan ..... RUNNING"],
+    ["checking demo components...", "memory ........ OK", "storage ....... OK", "power .......... checking", "demo scan ..... RUNNING"],
+    ["checking demo components...", "memory ........ OK", "storage ....... OK", "power .......... OK", "demo scan ..... RUNNING"],
+    ["simulated check complete", "memory ........ OK", "storage ....... OK", "power .......... OK", "demo scan ..... COMPLETE"]
+  ];
+
+  function runScan(){
+    clearInterval(stepTimer);
+    indicator.textContent = "● SCANNING";
+    cardValue.textContent = "SCANNING";
+    cardNote.textContent = "Running visual demo check…";
+    statusValue.textContent = "IN PROGRESS";
+    statusNote.textContent = "Not a real hardware test";
+    let step = 0;
+    const paint = () => {
+      scanSteps[step].forEach((value, index) => { lines[index].textContent = value; });
+      if (step === scanSteps.length - 1) {
+        clearInterval(stepTimer);
+        indicator.textContent = "● AUTO SCAN";
+        cardValue.textContent = "CHECK COMPLETE";
+        cardNote.textContent = "Next demo check in 10 sec";
+        statusValue.textContent = "DEMO OK";
+        statusNote.textContent = "Visual simulation only";
+      }
+      step++;
+    };
+    paint();
+    stepTimer = setInterval(paint, 650);
+  }
+
+  runScan();
+  scanTimer = setInterval(runScan, 10000);
+  // Stop timers when the page is hidden, then resume with a fresh demo scan.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      clearInterval(scanTimer);
+      clearInterval(stepTimer);
+    } else {
+      runScan();
+      scanTimer = setInterval(runScan, 10000);
+    }
+  });
+})();
+
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",()=>{if(innerWidth<901&&nav)nav.style.display="none"}));
 </script>
 </body></html>
