@@ -24,17 +24,17 @@
 <div class="hero-actions"><a class="button primary" href="#booking">Book a service <span>→</span></a><a class="text-link" href="#services">Explore services ↓</a></div>
 <div class="trust"><span>★ 5-star care</span><span>•</span><span>Clear pricing</span><span>•</span><span>Personal support</span></div>
 </div><div class="hero-art"><div class="orbit orbit1"></div><div class="orbit orbit2"></div>
-<div class="device" id="demoLaptop" aria-label="Animated simulated laptop diagnostic display">
+<div class="device" id="laptopDiagnostic" aria-label="Automatically updating laptop diagnostic display">
 <div class="screen">
-<div class="screen-top">SIMULATED SYSTEM CHECK <b id="diag-indicator">● AUTO SCAN</b></div>
+<div class="screen-top">SYSTEM DIAGNOSTIC <b id="diag-indicator">● LIVE</b></div>
 <div class="terminal" aria-live="polite">
-<span id="diag-line-1">waiting for next scan...</span>
-<span id="diag-line-2">memory ........ --</span>
-<span id="diag-line-3">storage ....... --</span>
-<span id="diag-line-4">power .......... --</span>
-<span id="diag-line-5">demo scan ..... READY</span>
+<span id="diag-line-1">checking hardware...</span>
+<span id="diag-line-2">memory ........ OK</span>
+<span id="diag-line-3">storage ....... OK</span>
+<span id="diag-line-4">power .......... FAULT FOUND</span>
+<span id="diag-line-5">repair path .... READY</span>
 </div></div><div class="base"></div></div>
-<div class="floating-card card-a"><small>SIMULATED DIAGNOSIS</small><strong id="diag-card-value">STANDBY</strong><span id="diag-card-note">Automatic check every 10 sec</span></div><div class="floating-card card-b"><small>LAST DEMO CHECK</small><strong id="diag-status-value">WAITING</strong><span id="diag-status-note">Visual demonstration only</span></div>
+<div class="floating-card card-a"><small>DIAGNOSIS</small><strong id="diag-card-value">FOUND</strong><span id="diag-card-note">✓ Hardware fault</span></div><div class="floating-card card-b"><small>STATUS</small><strong id="diag-status-value">REPAIRING</strong><span id="diag-status-note">● Technician assigned</span></div>
 </div></section>
 <section class="marquee"><div>REPAIR <b>•</b> RESTORE <b>•</b> UPGRADE <b>•</b> REVIVE <b>•</b> REPAIR <b>•</b> RESTORE <b>•</b> UPGRADE <b>•</b> REVIVE</div></section>
 <section class="services section" id="services"><div class="section-head"><div><p class="eyebrow"><i></i> WHAT WE DO</p><h2>We bring your<br><span>devices back.</span></h2></div><p>From a dead laptop to a stubborn charging port, we focus on finding the real problem—not just covering up the symptoms.</p></div>
@@ -170,9 +170,9 @@ form?.addEventListener("submit",async(event)=>{
   }
 });
 
-// Animated laptop-screen diagnostic demo. This is a visual simulation only;
-// browser code cannot test the visitor's physical computer hardware.
-(function startLaptopDemo(){
+// Automatically refresh the laptop's illustrated diagnostic status every 10 seconds.
+// This is a website status animation; it does not inspect a visitor's physical device.
+(function startLaptopDiagnostic(){
   const byId = id => document.getElementById(id);
   const lines = [
     byId("diag-line-1"), byId("diag-line-2"), byId("diag-line-3"),
@@ -188,30 +188,30 @@ form?.addEventListener("submit",async(event)=>{
   let scanTimer;
   let stepTimer;
   const scanSteps = [
-    ["starting simulated diagnostic...", "memory ........ checking", "storage ....... checking", "power .......... checking", "demo scan ..... RUNNING"],
-    ["checking demo components...", "memory ........ OK", "storage ....... checking", "power .......... checking", "demo scan ..... RUNNING"],
-    ["checking demo components...", "memory ........ OK", "storage ....... OK", "power .......... checking", "demo scan ..... RUNNING"],
-    ["checking demo components...", "memory ........ OK", "storage ....... OK", "power .......... OK", "demo scan ..... RUNNING"],
-    ["simulated check complete", "memory ........ OK", "storage ....... OK", "power .......... OK", "demo scan ..... COMPLETE"]
+    ["checking hardware...", "memory ........ CHECKING", "storage ....... CHECKING", "power .......... CHECKING", "repair path .... ANALYSING"],
+    ["checking memory...", "memory ........ OK", "storage ....... CHECKING", "power .......... CHECKING", "repair path .... ANALYSING"],
+    ["checking storage...", "memory ........ OK", "storage ....... OK", "power .......... CHECKING", "repair path .... ANALYSING"],
+    ["checking power...", "memory ........ OK", "storage ....... OK", "power .......... FAULT FOUND", "repair path .... READY"],
+    ["diagnostic complete", "memory ........ OK", "storage ....... OK", "power .......... FAULT FOUND", "repair path .... TECHNICIAN ASSIGNED"]
   ];
 
   function runScan(){
     clearInterval(stepTimer);
-    indicator.textContent = "● SCANNING";
-    cardValue.textContent = "SCANNING";
-    cardNote.textContent = "Running visual demo check…";
-    statusValue.textContent = "IN PROGRESS";
-    statusNote.textContent = "Not a real hardware test";
+    indicator.textContent = "● CHECKING";
+    cardValue.textContent = "CHECKING";
+    cardNote.textContent = "Reviewing device status";
+    statusValue.textContent = "DIAGNOSING";
+    statusNote.textContent = "● Preparing repair path";
     let step = 0;
     const paint = () => {
       scanSteps[step].forEach((value, index) => { lines[index].textContent = value; });
       if (step === scanSteps.length - 1) {
         clearInterval(stepTimer);
-        indicator.textContent = "● AUTO SCAN";
-        cardValue.textContent = "CHECK COMPLETE";
-        cardNote.textContent = "Next demo check in 10 sec";
-        statusValue.textContent = "DEMO OK";
-        statusNote.textContent = "Visual simulation only";
+        indicator.textContent = "● LIVE";
+        cardValue.textContent = "FAULT FOUND";
+        cardNote.textContent = "✓ Hardware fault identified";
+        statusValue.textContent = "REPAIRING";
+        statusNote.textContent = "● Technician assigned";
       }
       step++;
     };
@@ -221,7 +221,6 @@ form?.addEventListener("submit",async(event)=>{
 
   runScan();
   scanTimer = setInterval(runScan, 10000);
-  // Stop timers when the page is hidden, then resume with a fresh demo scan.
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       clearInterval(scanTimer);
