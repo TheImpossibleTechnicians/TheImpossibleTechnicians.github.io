@@ -31,7 +31,7 @@
 <span id="diag-line-1">checking hardware...</span>
 <span id="diag-line-2">memory ........ OK</span>
 <span id="diag-line-3">storage ....... OK</span>
-<span id="diag-line-4">power .......... FAULT FOUND</span>
+<span id="diag-line-4">power .......... <strong>FAULT FOUND</strong></span>
 <span id="diag-line-5">repair path .... READY</span>
 </div></div><div class="base"></div></div>
 <div class="floating-card card-a"><small>DIAGNOSIS</small><strong id="diag-card-value">FOUND</strong><span id="diag-card-note">✓ Hardware fault</span></div><div class="floating-card card-b"><small>STATUS</small><strong id="diag-status-value">REPAIRING</strong><span id="diag-status-note">● Technician assigned</span></div>
@@ -206,7 +206,14 @@ form?.addEventListener("submit",async(event)=>{
     statusNote.textContent = "● Preparing repair path";
     let step = 0;
     const paint = () => {
-      scanSteps[step].forEach((value, index) => { lines[index].textContent = value; });
+      scanSteps[step].forEach((value, index) => {
+        if (index === 3 && value.includes("FAULT FOUND")) {
+          // Keep only the fault label red, matching the original laptop display.
+          lines[index].innerHTML = value.replace("FAULT FOUND", "<strong>FAULT FOUND</strong>");
+        } else {
+          lines[index].textContent = value;
+        }
+      });
       if (step === scanSteps.length - 1) {
         clearInterval(stepTimer);
         indicator.textContent = "● LIVE";
